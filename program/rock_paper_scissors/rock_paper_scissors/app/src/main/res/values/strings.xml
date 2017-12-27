@@ -1,0 +1,10 @@
+<resources>
+    <string name="app_name">石头剪刀布</string>
+    <string name="win">你赢了!</string>
+    <string name="equal">平局!</string>
+    <string name="fail">电脑赢了!</string>
+    <string name="ready">准备就绪!</string>
+    <string name="choose">请选择你的出拳!</string>
+    <string name="again">再来一次</string>
+    <string name="htitle">历史记录</string>
+</resources>
