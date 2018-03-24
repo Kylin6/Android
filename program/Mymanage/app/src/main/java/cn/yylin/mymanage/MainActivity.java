@@ -2,49 +2,78 @@ package cn.yylin.mymanage;
 
 import android.app.Activity;
 import android.content.Intent;
-import android.support.v7.app.AppCompatActivity;
+import android.database.Cursor;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
-import android.widget.Button;
+import android.view.View.OnClickListener;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ImageView;
 import android.widget.ListView;
+import android.widget.SimpleCursorAdapter;
 
-import java.util.ArrayList;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends Activity implements OnClickListener{
+    //声明
+    private ImageView goButton;
+    // 声明list
+    private ListView list;
+    private Cursor cursor;
+    private DBHelper dbHelper;
+    //声明字段id
+    private int _id=0;
 
-    ImageView exit,add;
-    String TAG="123";
-    private ListView listView;
-    private ArrayList alist = new ArrayList();
-
-    create_file c=new create_file();
-    Activity content= MainActivity.this;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        exit = (ImageView) findViewById(R.id.exit);
-        add=(ImageView) findViewById(R.id.add);
-        //返回上一层
-        exit.setOnClickListener(new View.OnClickListener() {
+        dbHelper = new DBHelper(this);
+        // 得到游标
+        cursor = dbHelper.select();
+        goButton  = (ImageView)findViewById(R.id.btn_write);
+        goButton.setOnClickListener(this);
+        list=(ListView)findViewById(R.id.lv_title);
+        SimpleCursorAdapter adapter = new SimpleCursorAdapter(this, R.layout.item, cursor,
+                new String[]{DBHelper.CONTENT,DBHelper.Time}, new int[]{R.id.tv_info,R.id.tv_time});
+        //绑定适配器
+        list.setAdapter(adapter);
+        list.invalidateViews();
+        list.setOnItemClickListener(new OnItemClickListener() {
+
             @Override
-            public void onClick(View view) {
+            public void onItemClick(AdapterView<?> arg0, View arg1, int arg2,
+                                    long arg3) {
+                // TODO Auto-generated method stub
+                //查询方法
+                cursor.moveToPosition(arg2);
+                //如果没有查询到清零
+                _id = cursor.getInt(0);
+                //查询到了赋值
+                //contentText.setText(cursor.getString(1));
+                Intent intent = new Intent(MainActivity.this,Modify.class);
+                intent.putExtra("id", _id);
+                intent.putExtra("data", cursor.getString(1));
+                startActivity(intent);
                 finish();
             }
         });
-        //添加备忘录
-        add.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent intent =new Intent(MainActivity.this,createActivity.class);
-                startActivity(intent);
-            }
-        });
-        //显示备忘录信息
-
-        c.ReadFile(content,"a.txt");
     }
+
+    @Override
+    public void onClick(View arg0) {
+        switch (arg0.getId()) {
+            case R.id.btn_write:
+                Intent intent = new Intent(this,createActivity.class);
+                startActivity(intent);
+                finish();
+                break;
+
+            default:
+                break;
+        }
+
+    }
+
+
 }
